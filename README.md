@@ -32,8 +32,6 @@ This project builds an **end-to-end machine learning pipeline** to predict wheth
 
 ## 🖥️ Application Preview
 
-> 📸 **How to add screenshots:** Save three screenshots as `assets/screenshot_01_dashboard.png`, `assets/screenshot_02_predictor.png`, and `assets/screenshot_03_model.png`, then push to GitHub.
-
 ### Page 1 — RASFF Data Dashboard
 ![Dashboard — overview of 29,984 RASFF notifications with risk distribution, trend chart, and top hazard/origin breakdowns](assets/app_page1.png)
 *Interactive dashboard: risk decision distribution, notification trends (2020–2026), top food categories, origin countries, and category × hazard heatmap. Sidebar filters by year, category, and hazard type.*
