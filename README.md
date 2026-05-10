@@ -1,6 +1,7 @@
 # 🛡️ RASFF Risk Prediction System
 ### *Predicting food safety alert severity using machine learning on EU regulatory data*
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://hyejeong0617-rasff-risk-predictor-rasff-app-xpyl1f.streamlit.app/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](https://www.python.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-App-red?logo=streamlit)](https://streamlit.io/)
 [![XGBoost](https://img.shields.io/badge/Model-XGBoost-orange)](https://xgboost.readthedocs.io/)
