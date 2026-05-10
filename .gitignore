@@ -1,0 +1,22 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ── Virtual environment ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Large model / data artifacts ──────────────────────────────────────────────
+# nb3_splits_A/B.pkl → estimated ~150 MB each (29,984 rows × 671 features),
+#                      exceeds GitHub 100 MB hard limit.
+#                      Regenerate by running NB3 before NB4.
+nb3_splits_A.pkl
+nb3_splits_B.pkl
+
+# ── Streamlit cache ───────────────────────────────────────────────────────────
+.streamlit/

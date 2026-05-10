@@ -1,0 +1,15 @@
+{
+  "best_value": 0.844158,
+  "n_trials_completed": 61,
+  "note": "Manually saved from log \u2014 trial 53 was best",
+  "best_params": {
+    "n_estimators": 500,
+    "learning_rate": 0.05,
+    "max_depth": 6,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "reg_alpha": 0.1,
+    "reg_lambda": 1.0,
+    "min_child_weight": 5
+  }
+}
