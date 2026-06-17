@@ -312,10 +312,11 @@ All random seeds are fixed (`SEED = 42`). Train/test split is chronological, not
 | Project | Domain | Type | Status |
 |---|---|---|---|
 | **This repo** | EU regulatory notifications | ML pipeline · NLP · Streamlit | ✅ Live |
-| [amr_genomics_aeromonas](https://github.com/hyejeong0617/amr_genomics_aeromonas) | Microbial genomics · food safety | WGS pipeline · Python analysis · Streamlit | ✅ Live |
-| [foodborne_outbreaks_eda](https://github.com/hyejeong0617/foodborne_outbreaks_eda) | Food safety surveillance | EDA · entity normalisation · Streamlit | ✅ Live |
+| [foodborne_outbreaks_eda](https://github.com/hyejeong0617/foodborne_outbreaks_eda) | Food safety surveillance | EDA · SQL · entity normalisation · Streamlit | ✅ Live |
+| [aeromonas-growth-predictor](https://github.com/hyejeong0617/aeromonas-growth-predictor) | Predictive microbiology · food safety | ML · GPR · SHAP · Streamlit | ✅ Live |
+| [amr_genomics_aeromonas](https://github.com/hyejeong0617/amr_genomics_aeromonas) | Microbial genomics · One Health | WGS pipeline · Python analysis · Streamlit | ✅ Live |
 
-**The three projects form a connected portfolio** — analysing the food safety problem at three different scales: molecular genomics (this repo), population-level surveillance (foodborne EDA), and real-time EU regulatory signal (RASFF ML).
+**The four projects form a connected portfolio** — analysing food safety risk at four scales: real-time EU regulatory signal (this repo), population-level surveillance (foodborne EDA), growth kinetics modelling (Aeromonas predictor), and molecular genomics (AMR genomics).
 
 ---
 
@@ -332,7 +333,8 @@ This project is released under the [MIT License](LICENSE).
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Hyejeong%20Lee-0077B5?logo=linkedin&logoColor=white)](https://www.linkedin.com/in/hyejeong-lee-75887465/)
 [![GitHub](https://img.shields.io/badge/GitHub-hyejeong0617-181717?logo=github&logoColor=white)](https://github.com/hyejeong0617)
 
-*Open to Scientific Data Analyst and Regulatory Intelligence roles (Germany / Remote).*
+*Open to Domain Data Scientist / Regulatory Data Analyst roles in food safety, 
+      pharma, and biotech — Remote / Hybrid · Germany-based.*
 
 ---
 
