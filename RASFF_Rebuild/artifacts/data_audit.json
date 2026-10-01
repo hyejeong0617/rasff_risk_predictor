@@ -1,0 +1,21 @@
+{
+  "source": "C:\\Users\\SAMSUNG\\Downloads\\RASFF_Rebuild_Executable\\RASFF_Rebuild\\data\\CleanedDataset.csv",
+  "source_sha256": "108ee0009af0d194eb1609faf46b195eb9b2d7b3104a8652071b464d72f8c04a",
+  "loaded_rows": 27397,
+  "retained_rows": 27397,
+  "rejected_rows": 0,
+  "raw_malformed_records": 15,
+  "first_date": "2020-01-02 09:24:48",
+  "last_date": "2025-10-31 16:30:35",
+  "missing_hazards": 7156,
+  "label_counts": {
+    "serious": 14756,
+    "not serious": 4134,
+    "undecided": 3029,
+    "potential risk": 2689,
+    "potentially serious": 2372,
+    "no risk": 417
+  },
+  "scope": "All supplied product types, including food, feed and food contact material.",
+  "provenance_limit": "Historical clean snapshot inherits prior edits and exclusions. Raw malformed rows are audited, not silently repaired. Original manual correction (reference 2021.2621) is inherited; source verification remains a follow-up."
+}

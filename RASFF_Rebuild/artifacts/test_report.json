@@ -1,0 +1,73 @@
+{
+  "candidate": {
+    "name": "raw_lr_C2",
+    "algorithm": "lr",
+    "feature_set": "raw",
+    "c": 2.0
+  },
+  "test_rows": 4853,
+  "test_dates": [
+    "2024-11-26 09:45:15",
+    "2025-10-31 16:30:35"
+  ],
+  "calibrated": {
+    "accuracy": 0.7650937564393159,
+    "macro_f1": 0.7649171918660385,
+    "serious_precision": 0.7217741935483871,
+    "serious_recall": 0.7991071428571429,
+    "average_precision": 0.8032597855603466,
+    "roc_auc": 0.8440637642829808,
+    "brier": 0.16229871916352137,
+    "log_loss": 0.49581424042786576,
+    "threshold": 0.5
+  },
+  "uncalibrated": {
+    "accuracy": 0.7568514321038533,
+    "macro_f1": 0.7566281342966426,
+    "serious_precision": 0.6920289855072463,
+    "serious_recall": 0.8526785714285714,
+    "average_precision": 0.8032597855603466,
+    "roc_auc": 0.8440637642829808,
+    "brier": 0.17376607641407113,
+    "log_loss": 0.5414454586054362,
+    "threshold": 0.5
+  },
+  "prior_baseline": {
+    "accuracy": 0.4615701627859056,
+    "macro_f1": 0.3158043141125053,
+    "serious_precision": 0.4615701627859056,
+    "serious_recall": 1.0,
+    "average_precision": 0.4615701627859056,
+    "roc_auc": 0.5,
+    "brier": 0.2592951597538827,
+    "log_loss": 0.7118691502225603,
+    "threshold": 0.5
+  },
+  "development_train": {
+    "accuracy": 0.8917902760609806,
+    "macro_f1": 0.8895138034251693,
+    "serious_precision": 0.8953322643862462,
+    "serious_recall": 0.9156417964835565,
+    "average_precision": 0.9592994250182956,
+    "roc_auc": 0.9536589680457699,
+    "brier": 0.0839363089468569,
+    "log_loss": 0.2856353206233678,
+    "threshold": 0.5
+  },
+  "confusion_matrix_labels": [
+    0,
+    1
+  ],
+  "confusion_matrix": [
+    [
+      1923,
+      690
+    ],
+    [
+      450,
+      1790
+    ]
+  ],
+  "probability_note": "Sigmoid calibration uses the calibration block only. Assess Brier/log loss and reliability plot; calibration is not a guarantee under future shift.",
+  "source_sha256": "108ee0009af0d194eb1609faf46b195eb9b2d7b3104a8652071b464d72f8c04a"
+}

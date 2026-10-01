@@ -1,0 +1,26 @@
+[
+  {
+    "notebook": "01_Data_Audit_and_EDA.ipynb",
+    "code_cells": 6,
+    "status": "passed",
+    "method": "IPython in-process sequential cells; Jupyter kernel sockets unavailable"
+  },
+  {
+    "notebook": "02_Pipelines_and_Model_Selection.ipynb",
+    "code_cells": 5,
+    "status": "passed",
+    "method": "IPython in-process sequential cells; Jupyter kernel sockets unavailable"
+  },
+  {
+    "notebook": "03_Final_Evaluation_and_Model_Export.ipynb",
+    "code_cells": 5,
+    "status": "passed",
+    "method": "IPython in-process sequential cells; Jupyter kernel sockets unavailable"
+  },
+  {
+    "notebook": "04_Interactive_Dashboard.ipynb",
+    "code_cells": 4,
+    "status": "passed",
+    "method": "IPython in-process sequential cells; Jupyter kernel sockets unavailable"
+  }
+]

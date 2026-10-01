@@ -1,0 +1,6 @@
+{
+  "name": "raw_lr_C2",
+  "algorithm": "lr",
+  "feature_set": "raw",
+  "c": 2.0
+}
