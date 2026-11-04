@@ -6,12 +6,37 @@ import plotly.express as px
 import streamlit as st
 from rasff_core import DATA, ARTIFACTS, load_prepared, predict_bundle
 
-st.set_page_config(page_title="RASFF | Retrospective Label Classification", layout="wide")
+st.set_page_config(page_title="RASFF | Retrospective Label Classification", page_icon="📊", layout="wide", initial_sidebar_state="collapsed")
 st.markdown("""<style>
-.block-container {max-width:1180px;padding-top:2.5rem;padding-bottom:3rem;}
-h1,h2,h3 {letter-spacing:-.025em;}
-p,li {line-height:1.6;}
-@media(max-width:600px){.block-container{padding:1rem;}h1{font-size:1.9rem;}}
+/* Presentation only: the app uses the light Streamlit theme configured at repo root. */
+.stApp, [data-testid="stAppViewContainer"] {background:#F5F8FB;color:#20344A;}
+.block-container {max-width:1480px!important;width:100%!important;padding:2rem clamp(1.1rem,3.5vw,3.5rem) 3.5rem!important;}
+h1,h2,h3 {letter-spacing:-.035em;color:#172F49;}
+h1 {font-size:clamp(2rem,3vw,2.65rem)!important;font-weight:760!important;}
+h2,h3 {font-weight:700!important;}
+p,li {line-height:1.58;}
+.kicker {font-size:.78rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:#087B89;margin:.15rem 0 .65rem;}
+.intro {font-size:1.06rem;color:#516579;max-width:940px;line-height:1.65;margin:.2rem 0 .7rem;}
+.hero {background:linear-gradient(115deg,#FFFFFF 0%,#EAF5F7 100%);border:1px solid #DBE8EF;border-radius:16px;padding:1.5rem 1.75rem;margin:.4rem 0 1.35rem;}
+.hero h1 {margin:.1rem 0 .4rem;}
+.hero .scope {font-size:.86rem;color:#506579;margin-top:.8rem;}
+[data-testid="stMetric"] {background:#FFFFFF;border:1px solid #DDE7EF;border-radius:12px;padding:.8rem 1rem;box-shadow:0 2px 8px rgba(24,51,74,.035);}
+[data-testid="stMetricValue"] {color:#143E55;font-size:1.8rem!important;font-weight:750;}
+[data-testid="stMetricLabel"] {color:#536779;}
+[data-testid="stPlotlyChart"] {background:#FFFFFF;border:1px solid #E2EAF1;border-radius:12px;padding:.55rem;}
+[data-testid="stExpander"] {border:1px solid #DCE7EE;background:#FFFFFF;border-radius:12px;}
+[data-testid="stForm"] {border:1px solid #DAE6EE!important;background:#FFFFFF;border-radius:12px;padding:1rem;}
+[data-testid="stDataFrame"] {border-radius:9px;overflow:hidden;}
+[data-testid="stTabs"] button {font-weight:650;}
+[data-testid="stTabs"] [aria-selected="true"] {color:#087B89!important;}
+.stButton button[kind="primary"],.stFormSubmitButton button[kind="primary"] {border-radius:9px;font-weight:700;}
+.section-note {color:#587083;font-size:.88rem;margin:.25rem 0 1rem;}
+@media(max-width:700px){
+  .block-container {padding:1.15rem .85rem 2rem!important;}
+  .hero {padding:1.1rem 1rem;}
+  h1 {font-size:1.9rem!important;}
+  [data-testid="stMetricValue"] {font-size:1.4rem!important;}
+}
 </style>""", unsafe_allow_html=True)
 
 LABELS = {"category": "Product category", "type": "Product type",
@@ -53,6 +78,7 @@ def chart(fig, key):
 
 def explore():
     st.subheader("Explore RASFF notifications")
+    st.markdown('<div class="section-note">Explore recorded notifications by time, product, origin and official decision label.</div>', unsafe_allow_html=True)
     try:
         d = data((DATA / "prepared.csv").stat().st_mtime_ns)
     except (OSError, ValueError, KeyError):
@@ -92,7 +118,7 @@ def explore():
     a.metric("Selected notifications", f"{len(f):,}")
     b.metric("Recorded serious share", f"{f.target.mean():.1%}" if len(f) else "—")
     c.metric("Missing original hazards", f"{int(f.hazards.eq('').sum()):,}")
-    st.caption("Describes selected notifications, not population risk, inspection rates or country safety.")
+    st.caption("These are counts of recorded notifications, not population risk, inspection rates or country safety.")
     if f.empty:
         st.info("No notifications match. Broaden the filters or clear the search and apply again.")
         return
@@ -101,7 +127,7 @@ def explore():
     fig = px.bar(monthly, x="month", y="notifications", color="risk_decision",
                  color_discrete_map=dict(zip(sorted(d.risk_decision.unique()), COLORS)),
                  labels={"month": "Notification month", "notifications": "Notifications", "risk_decision": "Recorded decision"})
-    fig.update_layout(height=380)
+    fig.update_layout(height=390, bargap=0.17)
     chart(fig, "monthly")
     st.markdown("#### Most frequently recorded values")
     dimension = st.selectbox("Group by", list(LABELS), format_func=LABELS.get, key="dimension")
@@ -113,7 +139,7 @@ def explore():
                  color_discrete_sequence=[COLORS[0]], labels={"notifications": "Notifications", "position": ""})
     fig.update_traces(hovertemplate="%{customdata[0]}<br>%{x:,} notifications<extra></extra>")
     fig.update_yaxes(tickvals=counts.position.tolist(), ticktext=counts.short_label.tolist())
-    fig.update_layout(height=max(300, len(counts) * 31))
+    fig.update_layout(height=max(330, len(counts) * 37), margin=dict(l=15,r=25,t=25,b=40))
     chart(fig, "ranking")
     st.caption("Top 12 values within the filtered records. " + ("Origin values are recorded country combinations, not individual-country risk estimates." if dimension == "origin" else "Counts reflect notifications, not relative risk."))
     if st.checkbox("Show records and CSV download", key="show_records"):
@@ -126,6 +152,7 @@ def explore():
 
 def predictor():
     st.subheader("Predict the recorded label")
+    st.markdown('<div class="section-note">A demonstration of the frozen model, not a food-safety decision or forward prediction.</div>', unsafe_allow_html=True)
     st.write("Enter notification information to estimate whether its recorded risk decision would be **serious** rather than one of the other known labels.")
     try:
         bundle = load_model((ARTIFACTS / "final_bundle.joblib").stat().st_mtime_ns)
@@ -181,6 +208,7 @@ def predictor():
 
 def evaluation():
     st.subheader("Model & evaluation")
+    st.markdown('<div class="section-note">Held-out retrospective evaluation from the saved report; no metrics are recomputed here.</div>', unsafe_allow_html=True)
     try:
         report = artifact_json("test_report.json")
         scores = report["calibrated"]
@@ -216,12 +244,12 @@ def evaluation():
     st.markdown(f"[Inspect the frozen report]({REPO}/blob/main/RASFF_Rebuild/artifacts/test_report.json) · [Read the evidence audit]({REPO}/blob/main/RASFF_Rebuild/audit/REPORT.md)")
 
 
-st.caption("FOOD SAFETY DATA SCIENCE · HISTORICAL NOTIFICATIONS")
-st.title("RASFF Risk Predictor")
-st.markdown("### Retrospective Label Classification")
-st.write("Explore historical RASFF notifications and a saved model that distinguishes recorded serious decisions from other known labels.")
-st.caption("Research portfolio demo · Not an official food-safety risk assessment or an operational decision system.")
-st.divider()
+st.markdown("""<div class="hero">
+<div class="kicker">Scientific AI Builder / Food Safety Data Science</div>
+<h1>RASFF Risk Predictor</h1>
+<div class="intro"><strong>Retrospective label classification</strong> · Explore historical EU RASFF notifications, test a saved machine-learning model, and inspect its validation evidence.</div>
+<div class="scope">Research portfolio demo · Recorded <strong>serious</strong> labels, not actual food-harm probabilities or regulatory decisions.</div>
+</div>""", unsafe_allow_html=True)
 explorer_tab, predictor_tab, evaluation_tab = st.tabs(["Explore RASFF Notifications", "Predict Recorded Label", "Model & Evaluation"])
 with explorer_tab:
     explore()
@@ -230,5 +258,5 @@ with predictor_tab:
 with evaluation_tab:
     evaluation()
 st.divider()
-st.caption("Historical evidence, transparent methods and bounded interpretation.")
+st.caption("Historical evidence · Transparent methods · Bounded scientific interpretation")
 st.markdown(f"[Source repository]({REPO})")
