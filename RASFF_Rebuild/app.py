@@ -98,6 +98,47 @@ p,li {line-height:1.58;}
 .stFormSubmitButton button[kind="primary"] {background:#087B89!important;color:#FFFFFF!important;border-color:#087B89!important;}
 .key-finding {background:#EAF5F5!important;border-left:4px solid #128494;border-radius:9px;color:#1B4150!important;padding:1rem 1.15rem;margin:.7rem 0 1rem;line-height:1.55;}
 .key-finding strong {color:#115A66!important;}
+
+/* CRITICAL DROPDOWN FIX: BaseWeb popovers render in a portal outside .stApp.
+   Cover the dropdown list itself, each option and every nested text node. */
+html body div[data-baseweb="popover"],
+html body div[data-baseweb="popover"] [data-baseweb="menu"],
+html body div[data-baseweb="popover"] ul,
+html body div[data-baseweb="popover"] [role="listbox"],
+html body div[data-baseweb="popover"] [role="option"],
+html body div[data-baseweb="popover"] li {
+ background-color:#FFFFFF!important;color:#1B344A!important;
+}
+html body div[data-baseweb="popover"] [role="option"] *,
+html body div[data-baseweb="popover"] li *,
+html body div[data-baseweb="popover"] [data-baseweb="menu"] *,
+html body [role="listbox"] [role="option"] * {
+ color:#1B344A!important;-webkit-text-fill-color:#1B344A!important;
+ opacity:1!important;visibility:visible!important;
+}
+html body div[data-baseweb="popover"] [role="option"]:hover,
+html body div[data-baseweb="popover"] [role="option"][aria-selected="true"],
+html body div[data-baseweb="popover"] li:hover {
+ background-color:#E7F3F4!important;
+}
+html body [data-testid="stSelectbox"] [data-baseweb="select"] > div,
+html body [data-testid="stMultiSelect"] [data-baseweb="select"] > div {
+ background-color:#FFFFFF!important;border:1px solid #C9D9E4!important;
+}
+html body [data-testid="stSelectbox"] [data-baseweb="select"] input,
+html body [data-testid="stMultiSelect"] [data-baseweb="select"] input,
+html body [data-testid="stSelectbox"] [data-baseweb="select"] span,
+html body [data-testid="stMultiSelect"] [data-baseweb="select"] span {
+ color:#1B344A!important;-webkit-text-fill-color:#1B344A!important;
+}
+/* Preserve contrasting text inside selected multiselect tokens. */
+html body [data-testid="stMultiSelect"] [data-baseweb="tag"] {
+ background:#DDF1F2!important;
+}
+html body [data-testid="stMultiSelect"] [data-baseweb="tag"] * {
+ color:#115F6E!important;-webkit-text-fill-color:#115F6E!important;
+}
+
 @media(max-width:700px){
   .block-container {padding:1.15rem .85rem 2rem!important;}
   .hero {padding:1.1rem 1rem;}
