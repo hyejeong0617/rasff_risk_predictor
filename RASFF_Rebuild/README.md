@@ -14,7 +14,9 @@ python -m pip install -r requirements.txt
 python -m ipykernel install --user --name rasff-rebuild --display-name "RASFF Rebuild"
 ```
 
-Open notebooks 01–04 in VS Code or Jupyter and select the RASFF Rebuild kernel. Execute in order, with the extracted folder as the working directory. These are sequential executable notebooks, unlike the prior historical reading notebooks.
+For app-only use, skip kernel registration and launch below from `RASFF_Rebuild/`. The committed prepared data and model bundle are sufficient; no notebook execution or retraining is required.
+
+For a new reproduction cycle, notebooks 01–04 describe the sequential workflow with this folder as the working directory. Notebooks 01–02 can overwrite prepared/selection artifacts, and the existing final test must not be reused for tuning. Read the [evidence audit](audit/REPORT.md) before starting a new experiment.
 
 ```bash
 python -m streamlit run app.py
@@ -48,7 +50,7 @@ Explorer filters are descriptive and independent from Predictor. Prediction form
 
 The supplied clean snapshot contains 27,397 records and inherits historical manual changes/exclusions. Raw malformed records are logged, not independently resolved. Auditing field counts finds both overlong and short records; its count need not match the original parser's skipped-row count.
 
-All notebook code cells were run sequentially through in-process IPython. The hosted execution environment disallows kernel sockets, so a separate Jupyter kernel could not start here. The saved files are validated nbformat notebooks; normal local Jupyter/VS Code kernel execution should use the environment above. UI behavior was checked using Streamlit AppTest, not a published/browser-hosted deployment. See artifacts/notebook_execution.json and verification.json for the actual checks.
+The saved `artifacts/notebook_execution.json` records sequential in-process IPython execution of notebooks 01–04; it does not cover 05–06 or establish a fresh clean-room run. That recorded environment could not start a separate Jupyter kernel. Notebook 02 cell 10 retains a stale secondary output table; use `artifacts/candidate_summary.csv`, `artifacts/selected_spec.json` and `artifacts/test_report.json` for selection and final scores. Historical UI passes are recorded in `artifacts/verification.json`; they are not proof of a public deployment. See the [audit report](audit/REPORT.md) for independent checks and limitations. The full `verify_rebuild.py` script fits a model and writes artifacts, so it is not an inference-only smoke test.
 
 The shipped held-out results are already visible: do not iterate toward better scores on this test period. A new modelling decision needs another untouched evaluation design. Calibration may improve or worsen transfer; use reliability plots and Brier/log loss rather than treating it as proof of trustworthy real-world probabilities. Scores are not directly comparable with the original 87.36% because representation and evaluation changed.
 

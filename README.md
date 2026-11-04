@@ -1,168 +1,106 @@
-# RASFF Risk Predictor — from first ML project to audited rebuild
+# RASFF Risk Predictor | Retrospective Notification Classification
 
-A retrospective machine-learning project using public EU RASFF notification data.
+**Food-safety data science · Temporal evaluation · NLP · Calibrated machine learning · Streamlit**
 
-This repository intentionally preserves **three stages of the same project**: the original bootcamp work, an AI-assisted experimental rebuild, and the smaller audited rebuild that I now use as the portfolio reference.
+Can recorded RASFF notification information distinguish the **`serious` label** from other known risk-decision labels?
 
-> **Current portfolio version:** [`RASFF_Rebuild/`](./RASFF_Rebuild/)  
-> It is a retrospective classifier of the recorded `serious` label. It is **not** a food-safety, recall, or regulatory-risk decision system.
+This project answers that retrospective question using a historical notification snapshot, a shared scikit-learn pipeline and an interactive saved-model app. **[`RASFF_Rebuild/`](RASFF_Rebuild/) is the sole current portfolio implementation.**
 
-## Why this repository has multiple versions
+## Interactive Streamlit App
 
-The first version was built during a data-science bootcamp and achieved about 87% test accuracy under its original evaluation design. I later revisited the project with AI coding assistance and added more advanced feature engineering, temporal evaluation ideas, and a richer Streamlit interface.
+**[App source and local launch](RASFF_Rebuild/app.py)** · **[Setup guide](RASFF_Rebuild/README.md)** · **[Evidence audit](RASFF_Rebuild/audit/REPORT.md)**
 
-That second version looked more sophisticated, but the audit uncovered an important lesson: **more complex code is not automatically a more defensible model**. Some assumptions about prediction timing were stronger than the public data could support, preprocessing/model choices had become difficult to justify end-to-end, and the Streamlit predictor was not using the same trained model path described in the notebooks.
+The app provides three views:
 
-I therefore rebuilt the project again with a narrower question, a simpler architecture, explicit temporal blocks, preprocessing inside the fitted pipeline, separate calibration, and model/app parity checks.
+- **Explore notifications:** filter historical records, inspect descriptive charts and download selected rows.
+- **Predict recorded label:** enter the six fields used by the saved model.
+- **Model & evaluation:** inspect the selected candidate, frozen test metrics and confusion matrix.
 
-## Repository map
+A public deployment URL has not been verified. Launch the app locally with the committed data and bundle; notebook execution and retraining are unnecessary.
 
-| Folder | Role | Status |
-|---|---|---|
-| [`RASFF_Rebuild/`](./RASFF_Rebuild/) | Audited, executable rebuild and Streamlit app | **Current portfolio reference** |
-| [`original_bootcamps_summary/`](./original_bootcamps_summary/) | Curated retrospective of the first bootcamp project | Historical evidence / learning record |
-| [`claude_rebuild_experimental/`](./claude_rebuild_experimental/) | AI-assisted intermediate rebuild previously at repository root | Preserved experimental archive |
+> **Interpretation:** this is retrospective classification of recorded labels, not a validated food-safety, recall or regulatory decision system. “Other recorded labels” does not mean safe.
 
-## Current rebuild
+## Study scope and saved results
 
-### Question
+| Item | Verified evidence |
+|---|---|
+| Historical clean snapshot | **27,397 records**, 2020-01-02 to 2025-10-31; includes food, feed and other supplied types |
+| Target | `1 = serious`; `0 = not serious, undecided, potential risk, potentially serious, no risk` |
+| Selected model | **Logistic Regression `raw_lr_C2`**, C=2, followed by separate sigmoid calibration |
+| Final test | **4,853 records**, 2024-11-26 to 2025-10-31 |
+| Decision threshold | **0.50** |
 
-Can information recorded in a RASFF notification distinguish records labelled **`serious`** from the other known `risk_decision` labels?
-
-The rebuild deliberately avoids claiming that all public fields were available before the official decision. Public snapshots may be updated after the notification date, so the project is framed as **retrospective label classification**, not proven pre-decision risk prediction.
-
-### Default model inputs
-
-The selected model uses six original fields:
-
-- `subject`
-- `origin`
-- `category`
-- `type`
-- `notifying_country`
-- `hazards`
-
-Generated fields such as `Hazard_Type` and `simplified_hazard` are excluded from the primary model. `classification` is also excluded from the default prediction contract and tested separately as a late-information diagnostic.
-
-### Evaluation design
-
-- chronological calendar-day blocks: train / validation / calibration / final test
-- forward cross-validation inside the training block
-- TF-IDF and categorical encoders fit inside the sklearn pipeline
-- candidate selection without using the final test period
-- sigmoid calibration on a separate later block
-- fixed decision threshold of 0.50
-- final test written once and treated as frozen evidence
-
-### Selected model
-
-`raw_lr_C2` — Logistic Regression (`C=2`) with TF-IDF and one-hot encoded categorical inputs.
-
-Final held-out test: **4,853 records**, 2024-11-26 to 2025-10-31.
-
-| Metric | Score |
+| Calibrated final-test metric | Saved score |
 |---|---:|
 | Accuracy | **0.765** |
 | Macro F1 | **0.765** |
-| Serious precision | **0.722** |
-| Serious recall | **0.799** |
-| Average precision | **0.803** |
 | ROC-AUC | **0.844** |
-| Brier score | **0.162** |
-| Log loss | **0.496** |
+| Serious precision | 0.722 |
+| Serious recall | 0.799 |
+| Average precision | 0.803 |
+| Brier score | 0.162 |
+| Log loss | 0.496 |
 
-These scores are **not directly comparable** with the original ~87% result because the feature representation, preprocessing, split design, and evaluation question changed.
+Source: **[frozen test report](RASFF_Rebuild/artifacts/test_report.json)** and [saved predictions](RASFF_Rebuild/artifacts/test_predictions.csv). Values are rounded from saved evaluation artifacts; the portfolio audit did not retrain the model or recalculate metrics. These are historical held-out results, not external or prospective validation.
 
-### Verification
+## Methodology and project contribution
 
-The rebuild includes explicit checks for:
+The implementation connects explicit temporal evaluation, preprocessing within fitted pipelines, a controlled feature diagnostic and the same prediction function in notebooks and Streamlit.
 
-- temporal block separation
-- unseen token/category handling
-- default feature scope
-- save/reload prediction parity
-- Streamlit filter behavior
-- Streamlit prediction parity with the saved model bundle
+1. **Define the target and audit the snapshot.** Preserve the distinction between recorded seriousness and actual safety; record malformed raw rows and inherited cleaning limitations.
+2. **Split by whole observed calendar days.** Train, validation, calibration and test contain 14,668 / 4,748 / 3,128 / 4,853 records. See the [split manifest](RASFF_Rebuild/artifacts/split_manifest.json).
+3. **Compare candidates within development data.** Three expanding forward-CV folds rank eligible Logistic Regression, ComplementNB and XGBoost candidates by mean macro F1, with average precision as tie-breaker. Validation is a diagnostic.
+4. **Keep learned preprocessing inside each pipeline.** Subject/hazard TF-IDF, origin tokens and categorical one-hot encoding are fitted with the corresponding training data. The final selected pipeline refits on train + validation; a separate later block fits the sigmoid calibrator.
+5. **Export one prediction contract.** The [saved bundle](RASFF_Rebuild/artifacts/final_bundle.joblib) contains preprocessing, classifier, calibrator, input columns and threshold. The app calls the shared [`predict_bundle`](RASFF_Rebuild/rasff_core.py) function.
 
-See [`RASFF_Rebuild/artifacts/verification.json`](./RASFF_Rebuild/artifacts/verification.json).
+The six predictor fields are **`subject`, `origin`, `category`, `type`, `notifying_country`, `hazards`**. Generated hazard fields and follow-up fields are excluded from the primary contract.
 
-## Classification diagnostic
+### Late-information diagnostic
 
-A separate notebook adds only `classification` to the selected six-field architecture while keeping the rest of the comparison controlled.
+[Notebook 05](RASFF_Rebuild/05_Classification_LateInfo_Ablation.ipynb) clones the selected architecture and adds only `classification`. Its saved **uncalibrated validation** macro F1 rises from 0.769836 to 0.842444. This demonstrates additional retrospective signal; it does not establish that the field was available before the decision. `classification` remains excluded from the app, and the diagnostic does not replace the frozen final model or metrics.
 
-This experiment is used to answer **how much signal the field adds**, not to promote it automatically into the primary model. Predictive value and operational availability are treated as separate questions.
+## Run locally
 
-See [`05_Classification_LateInfo_Ablation.ipynb`](./RASFF_Rebuild/05_Classification_LateInfo_Ablation.ipynb).
-
-## Run the current version
+The Rebuild guide specifies Python 3.12 and pinned dependencies. From a fresh clone:
 
 ```bash
-cd RASFF_Rebuild
+git clone https://github.com/hyejeong0617/rasff_risk_predictor.git
+cd rasff_risk_predictor/RASFF_Rebuild
 python -m venv .venv
 # Windows PowerShell: .venv\Scripts\Activate.ps1
 # macOS/Linux: source .venv/bin/activate
 python -m pip install -r requirements.txt
-```
-
-Run notebooks in order:
-
-1. `01_Data_Audit_and_EDA.ipynb`
-2. `02_Pipelines_and_Model_Selection.ipynb`
-3. `03_Final_Evaluation_and_Model_Export.ipynb`
-4. `04_Interactive_Dashboard.ipynb`
-5. `05_Classification_LateInfo_Ablation.ipynb` — diagnostic extension
-
-Launch the app:
-
-```bash
 python -m streamlit run app.py
 ```
 
-For Korean execution notes, see [`RUN_GUIDE_KO.md`](./RASFF_Rebuild/RUN_GUIDE_KO.md).
+The app uses shipped `data/prepared.csv` and saved artifacts. Keep `rasff_core.py` alongside the app because the serialized pipeline references it. Load only trusted joblib files.
 
-## What I learned from rebuilding the project
+[Rebuild setup and design](RASFF_Rebuild/README.md) · [Korean run guide](RASFF_Rebuild/RUN_GUIDE_KO.md) · [Recorded dependency versions](RASFF_Rebuild/tested_environment.json)
 
-The main result is not that Logistic Regression replaced XGBoost, or that a score moved from ~87% to ~76%.
+## Scientific limitations and reproducibility
 
-The important change was methodological:
+- **Inherited provenance:** the clean snapshot retains earlier manual edits/exclusions, including reference 2021.2621. Its 27,397 rows and source hash are verified locally; the original cleaning history is not independently reconstructed.
+- **Timing and dependence:** chronological separation and fold-specific preprocessing are implemented, but public snapshot fields may contain later updates. Related notifications may span blocks. This does not establish pre-decision validity or exclude every leakage route.
+- **Notification bias:** the data lack a denominator of all marketed, imported or inspected products. Counts and model scores do not estimate population risk or country safety.
+- **Label and calibration limits:** class 0 includes uncertain and potentially serious labels. Historical calibration does not guarantee reliable future probabilities. No external validation or uncertainty intervals are supplied.
+- **Frozen evidence:** saved execution records cover notebooks 01–04; Notebook 02 retains a stale secondary output table. The authoritative selection and final metrics are the linked artifacts. The audit did not rerun notebooks or perform a clean-room dependency installation.
 
-```text
-first bootcamp project
-        ↓
-AI-assisted experimental rebuild
-        ↓
-audit assumptions and inference path
-        ↓
-redefine the prediction question
-        ↓
-chronology-aware, leakage-safe rebuild
-        ↓
-saved model contract
-        ↓
-same prediction path in the app
-```
+The **[seven-point audit](RASFF_Rebuild/audit/REPORT.md)** distinguishes implementation checks, saved verification results and new lightweight QA. Status: **READY WITH CAVEATS** as a retrospective learning portfolio.
 
-The project became more useful as a learning artifact when I could explain **what is predicted, when each input exists, how preprocessing is fit, where the test set is used, and whether the app really calls the evaluated model**.
+## Repository guide
 
-## Data and scope
+| Path | Purpose |
+|---|---|
+| [`RASFF_Rebuild/`](RASFF_Rebuild/) | Current notebooks, shared pipeline, app, data and frozen artifacts |
+| [`RASFF_Rebuild/audit/REPORT.md`](RASFF_Rebuild/audit/REPORT.md) | Evidence, issue register, scientific limitations and QA outcomes |
+| [`RASFF_Rebuild/06_Regulatory_Agent_Raw_Hazard_EDA.ipynb`](RASFF_Rebuild/06_Regulatory_Agent_Raw_Hazard_EDA.ipynb) | Separate exploratory case-selection extension; not a validated regulatory agent |
 
-The supplied historical clean snapshot contains 27,397 records and inherits earlier manual edits/exclusions. The rebuild audits malformed raw rows but does not claim to reconstruct every historical cleaning decision from source.
+Archived learning history is preserved in [`original_bootcamps_summary/`](original_bootcamps_summary/) and [`claude_rebuild_experimental/`](claude_rebuild_experimental/). These folders are outside the current implementation and audit scope.
 
-Target definition:
+## Related projects
 
-- **1** = recorded `serious`
-- **0** = every other known recorded label
+- [AMR Genomics — Aeromonas](https://github.com/hyejeong0617/amr_genomics_aeromonas)
+- [Aeromonas Growth Predictor](https://github.com/hyejeong0617/aeromonas-growth-predictor)
+- [Foodborne Outbreaks EDA](https://github.com/hyejeong0617/foodborne_outbreaks_eda)
 
-Class 0 therefore does **not** mean safe.
-
-RASFF Window is a notification database, not a denominator of all marketed or inspected food. Notification counts should not be interpreted as country, product, or population risk rates.
-
-## Technology
-
-Python · pandas · scikit-learn · XGBoost (comparison candidate) · Streamlit · Plotly · joblib
-
-## Project status
-
-**Portfolio 002: complete as an audited learning project.**
-
-Future work should start from a real regulatory workflow and user need rather than continuing to optimize this frozen test set.
+[GitHub profile](https://github.com/hyejeong0617)
