@@ -8,7 +8,7 @@ from rasff_core import DATA, ARTIFACTS, load_prepared, predict_bundle
 
 st.set_page_config(page_title="RASFF | Retrospective Label Classification", page_icon="📊", layout="wide", initial_sidebar_state="collapsed")
 st.markdown("""<style>
-/* Presentation only: the app uses the light Streamlit theme configured at repo root. */
+/* Presentation only: explicit light widgets complement Streamlit theme settings. */
 .stApp, [data-testid="stAppViewContainer"] {background:#F5F8FB;color:#20344A;}
 .block-container {max-width:1480px!important;width:100%!important;padding:2rem clamp(1.1rem,3.5vw,3.5rem) 3.5rem!important;}
 h1,h2,h3 {letter-spacing:-.035em;color:#172F49;}
@@ -31,6 +31,57 @@ p,li {line-height:1.58;}
 [data-testid="stTabs"] [aria-selected="true"] {color:#087B89!important;}
 .stButton button[kind="primary"],.stFormSubmitButton button[kind="primary"] {border-radius:9px;font-weight:700;}
 .section-note {color:#587083;font-size:.88rem;margin:.25rem 0 1rem;}
+.rasff-table {width:100%;border-collapse:separate;border-spacing:0;background:#FFFFFF;border:1px solid #D9E5EC;border-radius:10px;overflow:hidden;margin:.6rem 0 1rem;color:#20344A;}
+.rasff-table th {background:#EAF2F6;color:#264459;font-weight:700;text-align:left;padding:.8rem .9rem;border-bottom:1px solid #D9E5EC;}
+.rasff-table td {padding:.76rem .9rem;color:#20344A;border-bottom:1px solid #E7EEF3;}
+.rasff-table tr:last-child td {border-bottom:0;}
+.rasff-table tr:nth-child(even) td {background:#F8FAFC;}
+/* Theme reconciliation: Streamlit Cloud/viewer dark preferences can leave native
+   widgets dark even when the surrounding portfolio canvas is light. */
+:root {color-scheme:light;}
+[data-testid="stAppViewContainer"] {background:#F5F8FB!important;}
+[data-testid="stMainBlockContainer"],[data-testid="stMain"] {color:#20344A!important;}
+[data-testid="stAppViewContainer"] .stMarkdown,
+[data-testid="stAppViewContainer"] .stMarkdown p,
+[data-testid="stAppViewContainer"] .stMarkdown li,
+[data-testid="stAppViewContainer"] .stCaption,
+[data-testid="stAppViewContainer"] [data-testid="stCaptionContainer"],
+[data-testid="stAppViewContainer"] [data-testid="stCaptionContainer"] p,
+[data-testid="stWidgetLabel"] p,
+[data-testid="stWidgetLabel"] label {color:#20344A!important;opacity:1!important;}
+[data-testid="stTabs"] [role="tablist"] {border-bottom:1px solid #DCE6EF;gap:.6rem;}
+[data-testid="stTabs"] button[role="tab"] {color:#50667A!important;background:#EAF1F5!important;border-radius:9px 9px 0 0;padding:.65rem 1rem!important;opacity:1!important;}
+[data-testid="stTabs"] button[role="tab"] p {color:inherit!important;font-weight:650!important;}
+[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {color:#096B7B!important;background:#FFFFFF!important;border-bottom:3px solid #087B89!important;}
+/* Form controls: provide a readable white surface regardless of inherited theme. */
+[data-baseweb="select"] > div,
+[data-baseweb="input"],
+[data-baseweb="textarea"] textarea,
+[data-testid="stTextArea"] textarea,
+[data-testid="stTextInput"] input,
+[data-testid="stDateInput"] input {
+ background:#FFFFFF!important;color:#20344A!important;border-color:#CADAE5!important;
+}
+[data-baseweb="select"] input,[data-baseweb="select"] span,
+[data-baseweb="select"] div,[data-baseweb="input"] input,
+[data-testid="stTextArea"] textarea::placeholder,
+[data-testid="stTextInput"] input::placeholder {color:#20344A!important;}
+[data-baseweb="select"] svg {fill:#47657B!important;color:#47657B!important;}
+[data-baseweb="tag"] {background:#E1F1F2!important;}
+[data-baseweb="tag"] span {color:#155C69!important;}
+[data-baseweb="popover"] [role="listbox"],
+[data-baseweb="popover"] [role="option"],
+[role="listbox"] {background:#FFFFFF!important;color:#20344A!important;}
+[data-baseweb="popover"] [role="option"]:hover {background:#EAF4F6!important;}
+[data-testid="stMetricLabel"] p,[data-testid="stMetricValue"] {color:#173E55!important;opacity:1!important;}
+[data-testid="stForm"] {background:#FFFFFF!important;}
+[data-testid="stExpander"] summary,[data-testid="stExpander"] summary p {color:#20344A!important;}
+[data-testid="stDataFrame"] {background:#FFFFFF!important;}
+[data-testid="stCheckbox"] label p {color:#20344A!important;}
+[data-testid="stSelectbox"] label p,[data-testid="stMultiSelect"] label p {color:#20344A!important;}
+/* A compact reading width inside a wider, balanced dashboard. */
+[data-testid="stVerticalBlock"] > div:has(> [data-testid="stForm"]) {width:100%;}
+
 @media(max-width:700px){
   .block-container {padding:1.15rem .85rem 2rem!important;}
   .hero {padding:1.1rem 1rem;}
@@ -219,8 +270,9 @@ def evaluation():
         st.caption("Read directly from the saved test report; scores are not recalculated in the app.")
         if "confusion_matrix" in report:
             st.markdown("#### Where the classifier was right and wrong")
-            st.dataframe(pd.DataFrame(report["confusion_matrix"], index=["Actual other labels", "Actual serious"],
-                columns=["Predicted other labels", "Predicted serious"]), width="stretch")
+            matrix = pd.DataFrame(report["confusion_matrix"], index=["Actual other labels", "Actual serious"],
+                columns=["Predicted other labels", "Predicted serious"])
+            st.markdown(matrix.to_html(classes="rasff-table", border=0), unsafe_allow_html=True)
             st.caption("Rows = recorded labels; columns = model predictions. Other labels do not mean safe.")
         with st.expander("All saved evaluation metrics"):
             st.dataframe(pd.DataFrame({k: report[k] for k in ["calibrated", "uncalibrated", "prior_baseline"]}).rename(
@@ -232,7 +284,7 @@ def evaluation():
     try:
         splits = artifact_json("split_manifest.json")
         table = pd.DataFrame([{"Block": name.title(), "Records": block["rows"], "First day": block["first"][:10], "Last day": block["last"][:10]} for name, block in splits.items()])
-        st.dataframe(table, width="stretch", hide_index=True)
+        st.markdown(table.to_html(index=False, classes="rasff-table", border=0), unsafe_allow_html=True)
     except (OSError, ValueError, KeyError, TypeError):
         st.info("The saved split manifest is unavailable. Restore artifacts/split_manifest.json to view dates and counts.")
     st.markdown("#### Scientific boundaries")
