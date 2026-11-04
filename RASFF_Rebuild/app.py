@@ -82,6 +82,22 @@ p,li {line-height:1.58;}
 /* A compact reading width inside a wider, balanced dashboard. */
 [data-testid="stVerticalBlock"] > div:has(> [data-testid="stForm"]) {width:100%;}
 
+
+/* More coherent native controls and clear navigation, including dark-viewer override */
+[data-testid="stSegmentedControl"] {margin:.5rem 0 1.4rem;}
+[data-testid="stSegmentedControl"] button {background:#FFFFFF!important;color:#24465B!important;border:1px solid #CCDDE7!important;font-weight:700!important;padding:.65rem 1rem!important;}
+[data-testid="stSegmentedControl"] button p {color:inherit!important;}
+[data-testid="stSegmentedControl"] button[aria-pressed="true"],[data-testid="stSegmentedControl"] button[data-state="on"] {background:#087B89!important;color:#FFFFFF!important;border-color:#087B89!important;}
+[data-testid="stSelectbox"] [data-baseweb="select"] > div,[data-testid="stMultiSelect"] [data-baseweb="select"] > div {background:#FFFFFF!important;color:#20344A!important;border:1px solid #CADAE5!important;}
+[data-testid="stSelectbox"] [data-baseweb="select"] > div *,[data-testid="stMultiSelect"] [data-baseweb="select"] > div * {color:#20344A!important;}
+[data-testid="stMultiSelect"] [data-baseweb="tag"] {background:#DDF1F2!important;}
+[data-testid="stMultiSelect"] [data-baseweb="tag"] * {color:#0D6671!important;}
+[data-testid="stTextArea"] textarea {background:#FFFFFF!important;color:#20344A!important;border:1px solid #CADAE5!important;}
+[data-testid="stForm"] {background:#FFFFFF!important;}
+[data-testid="stMetric"] {border-top:3px solid #138795!important;}
+.stFormSubmitButton button[kind="primary"] {background:#087B89!important;color:#FFFFFF!important;border-color:#087B89!important;}
+.key-finding {background:#EAF5F5!important;border-left:4px solid #128494;border-radius:9px;color:#1B4150!important;padding:1rem 1.15rem;margin:.7rem 0 1rem;line-height:1.55;}
+.key-finding strong {color:#115A66!important;}
 @media(max-width:700px){
   .block-container {padding:1.15rem .85rem 2rem!important;}
   .hero {padding:1.1rem 1rem;}
@@ -267,13 +283,14 @@ def evaluation():
         st.caption(f"Frozen final test · {report['test_rows']:,} notifications · {report['test_dates'][0][:10]} to {report['test_dates'][1][:10]}")
         for col, (key, label) in zip(st.columns(4), [("accuracy", "Accuracy"), ("macro_f1", "Macro F1"), ("roc_auc", "ROC-AUC"), ("serious_recall", "Serious recall")]):
             col.metric(label, f"{scores[key]:.3f}")
+        st.markdown('<div class="key-finding"><strong>Key finding</strong> · The model identified 79.9% of recorded serious notifications in the frozen test, but missed 450 serious records. These results describe historical labels, not actual food harm.</div>', unsafe_allow_html=True)
         st.caption("Read directly from the saved test report; scores are not recalculated in the app.")
         if "confusion_matrix" in report:
             st.markdown("#### Where the classifier was right and wrong")
             matrix = pd.DataFrame(report["confusion_matrix"], index=["Actual other labels", "Actual serious"],
                 columns=["Predicted other labels", "Predicted serious"])
             st.markdown(matrix.to_html(classes="rasff-table", border=0), unsafe_allow_html=True)
-            st.caption("Rows = recorded labels; columns = model predictions. Other labels do not mean safe.")
+            st.caption("Of 2,240 recorded serious cases, 1,790 were identified and 450 were missed. Another 690 other-label notifications were predicted as serious. Other labels do not mean safe.")
         with st.expander("All saved evaluation metrics"):
             st.dataframe(pd.DataFrame({k: report[k] for k in ["calibrated", "uncalibrated", "prior_baseline"]}).rename(
                 columns={"calibrated": "Final calibrated model", "uncalibrated": "Before calibration", "prior_baseline": "Prior baseline"}), width="stretch")
@@ -302,12 +319,12 @@ st.markdown("""<div class="hero">
 <div class="intro"><strong>Retrospective label classification</strong> · Explore historical EU RASFF notifications, test a saved machine-learning model, and inspect its validation evidence.</div>
 <div class="scope">Research portfolio demo · Recorded <strong>serious</strong> labels, not actual food-harm probabilities or regulatory decisions.</div>
 </div>""", unsafe_allow_html=True)
-explorer_tab, predictor_tab, evaluation_tab = st.tabs(["Explore RASFF Notifications", "Predict Recorded Label", "Model & Evaluation"])
-with explorer_tab:
+section = st.segmented_control("Explore the project", ["01 · Explore notifications", "02 · Predict recorded label", "03 · Model & evaluation"], default="01 · Explore notifications", selection_mode="single", label_visibility="collapsed", key="section")
+if section == "01 · Explore notifications":
     explore()
-with predictor_tab:
+elif section == "02 · Predict recorded label":
     predictor()
-with evaluation_tab:
+else:
     evaluation()
 st.divider()
 st.caption("Historical evidence · Transparent methods · Bounded scientific interpretation")
